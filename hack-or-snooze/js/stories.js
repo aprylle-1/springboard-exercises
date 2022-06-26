@@ -31,6 +31,27 @@ function generateStoryMarkup(story) {
         <small class="story-hostname">(${hostName})</small>
         <small class="story-author">by ${story.author}</small>
         <small class="story-user">posted by ${story.username}</small>
+        <div class='all-stories-actions'>
+        <small class="story-user"><button class="all-stories-btn">Add to Favorites</button></small>
+        <small class="story-user"><button class="all-stories-btn">Remove Story</button></small>
+        </div>
+      </li>
+    `);
+}
+
+function generateFavoriteStoryMarkup(story) {
+  // console.debug("generateStoryMarkup", story);
+
+  const hostName = story.getHostName();
+  return $(`
+      <li id="${story.storyId}">
+        <a href="${story.url}" target="a_blank" class="story-link">
+          ${story.title}
+        </a>
+        <small class="story-hostname">(${hostName})</small>
+        <small class="story-author">by ${story.author}</small>
+        <small class="story-user">posted by ${story.username}</small>
+        <small><button>Remove Favorite</button></small>
       </li>
     `);
 }
@@ -82,4 +103,61 @@ $btnSubmitNewStory.on('click', function (e) {
   e.preventDefault()
   const story = getStoryDetails();
   submitStoryDetails(story);
+})
+
+//gets story Id based on clicked element
+function getStoryId (element){
+  const storyId = element.id
+  return storyId;
+}
+
+//gets currentUsers favorites and creates HTML for it
+function putFavoriteStoriesOnPage () {
+  $favoriteStoriesList.empty();
+  for (let story of currentUser.favorites) {
+    const $story = generateFavoriteStoryMarkup(story)
+    $favoriteStoriesList.append($story);
+  }
+}
+
+/* on clicl of button, function getStoryId gets that Id of favorited story and then calls saveFavorite, checkForRememberedUser is called to refrest currentUser value */
+$allStoriesList.on('click', async function(event){
+  if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Add to Favorites'){
+    console.log('Add to Favorites')
+    const storyId = getStoryId(event.target.parentElement.parentElement.parentElement);
+    if (currentUser.favorites.some(story => {
+      return story.storyId === storyId
+    })) {
+      alert('Story Already Added')
+    }
+    else{
+      await User.saveFavorite(currentUser.loginToken, currentUser.username, storyId);
+      alert('Added to Favorites')
+    }
+  }
+  else if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove Story'){
+    try{
+      console.log('Remove Story');
+      const element = event.target.parentElement.parentElement.parentElement
+      const storyId = getStoryId(element);
+      await StoryList.removeStory(currentUser.loginToken, storyId);
+      element.remove();
+    }
+    catch(error){
+      //added error handling when user that is login is trying to remove an article that's not theirs
+      console.log(error)
+      alert('You are not allowed to remove this story')
+    }
+  }
+})
+
+$favoriteStoriesSection.on('click', async function(event){
+  event.preventDefault();
+  if(event.target.tagName === 'BUTTON'){
+    console.log(currentUser.favorites.length)
+    const storyId = getStoryId(event.target.parentElement.parentElement);
+    await User.deleteFavorite(currentUser.loginToken, currentUser.username, storyId);
+    alert('Removed from Favorites!')
+    console.log(currentUser.favorites.length);
+    }
 })

@@ -90,6 +90,17 @@ class StoryList {
     return response.data
     // UNIMPLEMENTED: complete this function!
   }
+
+  static async removeStory (token, storyId) {
+    const response = await axios({
+      url : `${BASE_URL}/stories/${storyId}`,
+      method : "DELETE",
+      data : {
+        token
+      }
+    })
+    return response.data;
+  }
 }
 /******************************************************************************
  * User: a user in the system (only used to represent the current user)
@@ -203,6 +214,34 @@ class User {
     } catch (err) {
       console.error("loginViaStoredCredentials failed", err);
       return null;
+    }
+  }
+  /* static function that adds favorites to login user */
+  static async saveFavorite(token, username, storyId) {
+    try{
+      const response = await axios({
+        url : `${BASE_URL}/users/${username}/favorites/${storyId}`,
+        method : "POST",
+        data: {token}
+      })
+      await checkForRememberedUser();
+    }
+    catch (error) {
+        alert(error.message)
+    }
+  }
+
+  static async deleteFavorite(token, username, storyId) {
+    try{
+      const response = await axios({
+        url : `${BASE_URL}/users/${username}/favorites/${storyId}`,
+        method : "DELETE",
+        data: {token}
+      })
+      await checkForRememberedUser();
+    }
+    catch (error) {
+        alert(error.message)
     }
   }
 }

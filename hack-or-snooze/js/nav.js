@@ -34,12 +34,27 @@ function updateNavOnLogin() {
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
   $navSubmit.show();
+  $navFavorites.show();
 }
 
 /* When user clicks on Submit the Submit form must Show */
-function navSubmitClick(){
-  console.log('SHOW SUBMIT FORM');
+function navSubmitClick(){;
+  $allStoriesList.hide();
   $submitStoryForm.show()
+  $favoriteStoriesSection.hide();
 }
 
 $navSubmit.on('click', navSubmitClick)
+
+function navFavoritesClick(){
+  $allStoriesList.hide(),
+  $favoriteStoriesSection.show();
+  $submitStoryForm.hide();
+}
+
+$navFavorites.on('click', function(e){
+  e.preventDefault();
+  putFavoriteStoriesOnPage();
+  navFavoritesClick();
+});
+
