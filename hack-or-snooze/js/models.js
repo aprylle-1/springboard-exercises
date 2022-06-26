@@ -25,10 +25,21 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
-  }
+    let url_split = this.url.split('/');
+    url_split = url_split[2]; 
+    url_split = url_split.split('www.')
+    let url_final = url_split.reduce(function(hostName, currPart){
+      if (currPart === ""){
+        hostName = hostName
+      }
+      else{
+        hostName = currPart
+      }
+      return hostName;
+    })
+    return (url_final);
 }
-
+}
 
 /******************************************************************************
  * List of Story instances: used by UI to show story lists in DOM.

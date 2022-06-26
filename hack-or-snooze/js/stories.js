@@ -21,13 +21,33 @@ async function getAndShowStoriesOnStart() {
 
 function generateStoryMarkup(story) {
   // console.debug("generateStoryMarkup", story);
-
   const hostName = story.getHostName();
-  return $(`
-      <li id="${story.storyId}">
+  //changing HTML depending if a user is logged in or not
+  if(currentUser){
+    //checking if currentUser has favorites -> if yes, button will show remove from Favorites instead of Add to Favorites
+    if(currentUser.favorites.some(faveStory => {
+      return faveStory.storyId === story.storyId
+      })){
+      return $(`
+    <li id="${story.storyId}">
+      <a href="${story.url}" target="a_blank" class="story-link">
+        ${story.title}
+      </a>
+      <small class="story-hostname">(${hostName})</small>
+      <small class="story-author">by ${story.author}</small>
+      <small class="story-user">posted by ${story.username}</small>
+      <div class='all-stories-actions'>
+      <small class="story-user"><button class="all-stories-btn">Remove from Favorites</button></small>
+      <small class="story-user"><button class="all-stories-btn">Remove Story</button></small>
+      </div>
+    </li>
+      `);
+      }
+      return $(`
+        <li id="${story.storyId}">
         <a href="${story.url}" target="a_blank" class="story-link">
-          ${story.title}
-        </a>
+         ${story.title}
+         </a>
         <small class="story-hostname">(${hostName})</small>
         <small class="story-author">by ${story.author}</small>
         <small class="story-user">posted by ${story.username}</small>
@@ -37,6 +57,20 @@ function generateStoryMarkup(story) {
         </div>
       </li>
     `);
+  }
+  //no buttons if no user is logged in
+  return $(`
+  <li id="${story.storyId}">
+    <a href="${story.url}" target="a_blank" class="story-link">
+      ${story.title}
+    </a>
+    <small class="story-hostname">(${hostName})</small>
+    <small class="story-author">by ${story.author}</small>
+    <small class="story-user">posted by ${story.username}</small>
+    <div class='all-stories-actions'>
+    </div>
+  </li>
+`);
 }
 
 function generateFavoriteStoryMarkup(story) {
@@ -123,6 +157,7 @@ function putFavoriteStoriesOnPage () {
 /* on clicl of button, function getStoryId gets that Id of favorited story and then calls saveFavorite, checkForRememberedUser is called to refrest currentUser value */
 $allStoriesList.on('click', async function(event){
   if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Add to Favorites'){
+    console.dir(event.target);
     console.log('Add to Favorites')
     const storyId = getStoryId(event.target.parentElement.parentElement.parentElement);
     if (currentUser.favorites.some(story => {
@@ -133,6 +168,7 @@ $allStoriesList.on('click', async function(event){
     else{
       await User.saveFavorite(currentUser.loginToken, currentUser.username, storyId);
       alert('Added to Favorites')
+      event.target.textContent = 'Remove from Favorites';
     }
   }
   else if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove Story'){
@@ -149,15 +185,30 @@ $allStoriesList.on('click', async function(event){
       alert('You are not allowed to remove this story')
     }
   }
+  else if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove from Favorites'){
+    try{
+      console.log('this works');
+      // console.log('Remove Story');
+      const element = event.target.parentElement.parentElement.parentElement
+      const storyId = getStoryId(element);
+      await User.deleteFavorite(currentUser.loginToken, currentUser.username, storyId);
+      alert('Removed from Favorites!')
+      event.target.textContent = 'Add to Favorites';
+    }
+    catch(error){
+      //added error handling when user that is login is trying to remove an article that's not theirs
+      console.log(error)
+    }
+  }
 })
 
 $favoriteStoriesSection.on('click', async function(event){
-  event.preventDefault();
   if(event.target.tagName === 'BUTTON'){
     console.log(currentUser.favorites.length)
     const storyId = getStoryId(event.target.parentElement.parentElement);
     await User.deleteFavorite(currentUser.loginToken, currentUser.username, storyId);
     alert('Removed from Favorites!')
+    event.target.parentElement.parentElement.remove();
     console.log(currentUser.favorites.length);
     }
 })
