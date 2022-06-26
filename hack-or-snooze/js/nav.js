@@ -47,7 +47,7 @@ function navSubmitClick(){;
 $navSubmit.on('click', navSubmitClick)
 
 function navFavoritesClick(){
-  $allStoriesList.hide(),
+  $allStoriesList.hide();
   $favoriteStoriesSection.show();
   $submitStoryForm.hide();
 }
@@ -57,4 +57,3 @@ $navFavorites.on('click', function(e){
   putFavoriteStoriesOnPage();
   navFavoritesClick();
 });
-
