@@ -50,3 +50,36 @@ function putStoriesOnPage() {
 
   $allStoriesList.show();
 }
+
+/* this creates a story object based on user unit */
+function getStoryDetails() {
+  console.log('submit a new story')
+  const $storyAuthor = $('#submit-author').val()
+  const $storyTitle = $('#submit-title').val()
+  const $storyUrl = $('#submit-url').val()
+  const story = {
+    author : $storyAuthor,
+    title : $storyTitle,
+    url : $storyUrl
+  }
+  return story
+
+}
+
+/* this calls the async post function to post a new user story, if successful, storyList will be updated using getAndShowStoriesOnStart, page will then be updated to show the new generated story*/
+
+async function submitStoryDetails(story){
+  await StoryList.addStory(currentUser, story);
+  await getAndShowStoriesOnStart();
+  putStoriesOnPage();
+  $submitStoryForm.hide();
+  console.log('successfully added a new story')
+}
+
+const $btnSubmitNewStory = $("#btn-submit-new-story")
+
+$btnSubmitNewStory.on('click', function (e) {
+  e.preventDefault()
+  const story = getStoryDetails();
+  submitStoryDetails(story);
+})

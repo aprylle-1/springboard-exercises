@@ -33,4 +33,13 @@ function updateNavOnLogin() {
   $navLogin.hide();
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
+  $navSubmit.show();
 }
+
+/* When user clicks on Submit the Submit form must Show */
+function navSubmitClick(){
+  console.log('SHOW SUBMIT FORM');
+  $submitStoryForm.show()
+}
+
+$navSubmit.on('click', navSubmitClick)
