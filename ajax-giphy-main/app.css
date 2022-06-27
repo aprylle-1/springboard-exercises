@@ -1,0 +1,25 @@
+body{
+    background-color: black;
+    color: white;
+}
+img{
+    width: 400px;
+    height: 300px;
+}
+input[type='text']{
+    margin-top: 5px;
+    padding: 4px 5px 6px 5px;
+}
+#gifs{
+    display: flex;
+    flex-flow: row wrap;
+    row-gap: 20px;
+    justify-content: space-evenly;
+}
+h1{
+    text-align: center;
+}
+form{
+    margin: auto;
+    text-align: center;
+}
