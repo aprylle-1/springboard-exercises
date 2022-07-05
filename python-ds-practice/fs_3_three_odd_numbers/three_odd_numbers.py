@@ -13,3 +13,10 @@ def three_odd_numbers(nums):
         >>> three_odd_numbers([1, 2, 3, 3, 2])
         False
     """
+    consecutives = []
+    for x in range(len(nums)):
+        if x < (len(nums) - 2):
+            sum = nums[x] + nums[x + 1] + nums[x + 2]
+            if sum%2 == 1:
+                return True
+    return False

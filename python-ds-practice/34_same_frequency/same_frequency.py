@@ -10,3 +10,7 @@ def same_frequency(num1, num2):
         >>> same_frequency(1212, 2211)
         True
     """
+    for x in str(num1):
+        if str(num1).count(x) != str(num2).count(x):
+            return False
+    return True

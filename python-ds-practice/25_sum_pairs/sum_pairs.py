@@ -21,3 +21,28 @@ def sum_pairs(nums, goal):
         >>> sum_pairs([11, 20, 4, 2, 1, 5], 100)
         ()
     """
+    curr_pair = [[len(nums) + 1, len(nums) + 1],[len(nums) + 1, len(nums) + 1]]
+    pair = []
+    pair_index = []
+    for num in nums:
+        to_add = goal - num
+        if nums.count(to_add) == 1 and nums.index(to_add) > nums.index(num):
+            pair = [num, to_add]
+            pair_index = [nums.index(num), nums.index(to_add)]
+        elif nums.count(to_add) > 1:
+            curr_index = 0
+            for x in range(len(nums)):
+                if nums[x] == to_add and x > curr_index:
+                    curr_index = x
+            pair = [num, to_add]
+            pair_index = [nums.index(num), curr_index]
+        else:
+            pair = [len(nums) + 1, len(nums) + 1]
+            pair_index = [len(nums) + 1, len(nums) + 1]
+        if pair_index[1] < curr_pair[1][1]:
+            curr_pair[0] = pair
+            curr_pair[1] = pair_index
+    if curr_pair == [[len(nums) + 1, len(nums) + 1],[len(nums) + 1, len(nums) + 1]]:
+        return ()
+    else:
+        return (curr_pair[0][0],curr_pair[0][1])

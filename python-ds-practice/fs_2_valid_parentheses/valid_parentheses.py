@@ -1,3 +1,6 @@
+from re import L
+
+
 def valid_parentheses(parens):
     """Are the parentheses validly balanced?
 
@@ -22,3 +25,13 @@ def valid_parentheses(parens):
         >>> valid_parentheses(")()(")
         False
     """
+    is_balanced = 0
+    for char in parens:
+        if char == "(":
+            is_balanced += 1
+        else:
+            is_balanced -= 1
+    if is_balanced == 0:
+        return True
+    else:
+        return False

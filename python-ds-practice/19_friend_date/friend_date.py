@@ -19,7 +19,6 @@ def friend_date(a, b):
     friend1_hobbies = a[2]
     friend2_hobbies = b[2]
     in_common = [hobby for hobby in friend1_hobbies if hobby in friend2_hobbies]
-    print(in_common)
     if in_common:
         return True
     else:

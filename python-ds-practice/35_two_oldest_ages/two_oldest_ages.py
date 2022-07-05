@@ -1,3 +1,6 @@
+from types import AsyncGeneratorType
+
+
 def two_oldest_ages(ages):
     """Return two distinct oldest ages as tuple (second-oldest, oldest)..
 
@@ -21,3 +24,8 @@ def two_oldest_ages(ages):
     # you may find it helpful to research the `sorted(iter)` function, which
     # can take *any* type of list-like-thing, and returns a new, sorted list
     # from it.
+    ages.sort(reverse=True)
+    if ages.count(ages[0]) > 1:
+        return (ages[ages.count(ages[0])], ages[0])
+    else:
+        return (ages[1], ages[0])
