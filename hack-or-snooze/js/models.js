@@ -99,7 +99,6 @@ class StoryList {
       }
     })
     return response.data
-    // UNIMPLEMENTED: complete this function!
   }
 
   static async removeStory (token, storyId) {

@@ -157,38 +157,33 @@ function putFavoriteStoriesOnPage () {
 /* on clicl of button, function getStoryId gets that Id of favorited story and then calls saveFavorite, checkForRememberedUser is called to refrest currentUser value */
 $allStoriesList.on('click', async function(event){
   if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Add to Favorites'){
-    console.dir(event.target);
-    console.log('Add to Favorites')
-    const storyId = getStoryId(event.target.parentElement.parentElement.parentElement);
-    if (currentUser.favorites.some(story => {
-      return story.storyId === storyId
-    })) {
-      alert('Story Already Added')
-    }
-    else{
-      await User.saveFavorite(currentUser.loginToken, currentUser.username, storyId);
-      alert('Added to Favorites')
-      event.target.textContent = 'Remove from Favorites';
-    }
+      try{
+        console.log('Add to Favorites')
+        const storyId = getStoryId(event.target.parentElement.parentElement.parentElement);
+        await User.saveFavorite(currentUser.loginToken, currentUser.username, storyId);
+        alert('Added to Favorites')
+        event.target.textContent = 'Remove from Favorites';
+      }
+      catch(error){
+        console.log(error)
+      }
+
   }
   else if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove Story'){
-    try{
-      console.log('Remove Story');
-      const element = event.target.parentElement.parentElement.parentElement
-      const storyId = getStoryId(element);
-      await StoryList.removeStory(currentUser.loginToken, storyId);
-      element.remove();
-    }
-    catch(error){
-      //added error handling when user that is login is trying to remove an article that's not theirs
-      console.log(error)
-      alert('You are not allowed to remove this story')
-    }
+      try{
+        console.log('Remove Story');
+        const element = event.target.parentElement.parentElement.parentElement
+        const storyId = getStoryId(element);
+        await StoryList.removeStory(currentUser.loginToken, storyId);
+        element.remove();
+        }
+      catch(error){
+        console.log(error)
+        alert('You are not allowed to remove this story')
+      }
   }
   else if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove from Favorites'){
     try{
-      console.log('this works');
-      // console.log('Remove Story');
       const element = event.target.parentElement.parentElement.parentElement
       const storyId = getStoryId(element);
       await User.deleteFavorite(currentUser.loginToken, currentUser.username, storyId);
@@ -196,7 +191,6 @@ $allStoriesList.on('click', async function(event){
       event.target.textContent = 'Add to Favorites';
     }
     catch(error){
-      //added error handling when user that is login is trying to remove an article that's not theirs
       console.log(error)
     }
   }

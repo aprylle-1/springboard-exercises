@@ -35,7 +35,10 @@ function hidePageComponents() {
   components.forEach(c => c.hide());
 }
 
-/* Will hide components that are not to be seen on initial load*/
+/* Will hide components that are not to be seen on initial load -> this is for when a user is logged in
+They should not be able to click on submit and favorites on the nav-bar
+Submit Form and Fave Section is  hidden as well
+*/
 function hidePageComponentsOnInitialLoad(){
   const components = [
     $navSubmit,
