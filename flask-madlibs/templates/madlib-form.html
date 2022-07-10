@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Madlib Form Generator{% endblock %}
+
+{% block content %}  
+<h2>Madlib Form</h2>
+<p>Give me words, and I'll create a story for you!</p>
+<form action="/story">
+    <input type="hidden" name="story_num" value={{story_num}}>
+    {% for prompt in prompts %}
+    <label for={{prompt}}>{{prompt.capitalize()}}</label>
+    <input type="text" name={{prompt}}>
+    {% endfor %}
+    <button>Submit</button>
+</form>
+{% endblock %}
