@@ -6,4 +6,7 @@
 {% for i in range(questions_length)%}
 <p>{{questions[i].question}} - {{responses[i]}}</p>
 {% endfor %}
+<form action="/">
+    <button>Start Survey Again?</button>
+</form>
 {% endblock %}
