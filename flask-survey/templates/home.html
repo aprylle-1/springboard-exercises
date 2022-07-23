@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Page{% endblock %}
+{% block content %}
+<h1>Take Your Surveys Here!</h1>
+<ol>
+{% for key in surveys.keys() %}
+<li id="{{key}}">{{surveys[key].title}}</li>
+{% endfor %}
+</ol>
+<form action="/questions/0">
+    <button>Start Survey</button>
+</form>
+{% endblock %}

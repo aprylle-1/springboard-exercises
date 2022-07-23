@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}End of Survey{% endblock %}
+{%block content %}
+<h1>Thank You for Answering!</h1>
+<P>Here are your reponses:</P>
+{% for i in range(questions_length)%}
+<p>{{questions[i].question}} - {{responses[i]}}</p>
+{% endfor %}
+{% endblock %}
