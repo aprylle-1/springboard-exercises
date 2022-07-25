@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/app.css?v=2">
+    <title>Document</title>
+</head>
+<body>
+<div class="container"><span>High Score: </span><span id="high-score"></span></div>
+<div class="container"><span>Times Played: </span><span id="times-played"></span></div>
+<div class="container"><span>Score:</span><span id="score">0</span></div>
+<div class="container"><span>Time:</span> <span id="timer">15</span></div>
+<table>
+    {% for row in board %}
+        <tr>
+            {% for ltr in row %}
+                <td>{{ltr}}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>
+<div class="container" id="message"></div>
+<form id="submit-form">
+    <input type="text" name="submitted_word" id="submitted-word">
+    <button id="btn-submit-word">Submit Word</button>
+</form>
+<form id="new-game" style="display: none;" action="/reset-board">
+    <button>New Game</button>
+</form>
+<script src="https://unpkg.com/jquery"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<script src="/static/app.js?v=2"></script>
+<script src="/static/timer.js"></script>
+</body>
+</html>
