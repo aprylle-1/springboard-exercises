@@ -1,0 +1,29 @@
+{% extends 'base.html'%}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+<style>
+    button{
+        margin-top: 20px;
+        float: right;
+        padding-right: 30px;
+        padding-left: 30px;
+    }
+</style>
+<h1>Create User</h1>
+{% if errors %}
+    {%for error in errors%}
+    <p class="alert alert-danger">{{error}}</p>
+    {% endfor %}
+{% endif %}
+<form action="/users/new" method="POST">
+    <div><label for="first-name">First Name</label></div>
+    <div><input class="form-control" type="text" name="first_name"></div>
+    <div><label for="first-name">Last Name</label></div>
+    <div><input class="form-control" type="text" name="last_name"></div>
+    <div><label for="first-name">Image URL</label></div>
+    <div><input class="form-control" type="text" name="image_url"></div>
+    <button class="btn btn-outline-primary">Add</button>
+</form>
+{% endblock %}

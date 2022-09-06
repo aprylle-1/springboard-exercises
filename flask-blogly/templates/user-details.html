@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{%block stylesheets%}
+<link rel="stylesheet" href="/static/user-details.css">
+{% endblock %}
+{% block title%}User {{user.get_user_full_name()}}{% endblock %}
+{% block content %}
+<h1>{{user.get_user_full_name()}}</h1>
+<style>
+    .user-profile{
+        display: flex;
+        margin: auto;
+    }
+
+    .user-details{
+        margin: auto;
+    }
+    
+    #user-image{
+        width: 250px;
+        height: 250px;
+    }
+    
+    .buttons{
+        display: flex;
+    }
+    a{  
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-right: 20px;
+    }
+</style>
+<div class="user-profile">
+    <div>
+        <img id="user-image" src="{{user.image_url}}" alt="">
+    </div>
+    <div class="user-details">
+        <div>First Name - {{user.first_name}}</div>
+        <div>Last name - {{user.last_name}}</div>
+        <div class="buttons">
+            <a href="/users/{{user.id}}/edit" class="btn btn-outline-primary">Edit</a>
+            <form action="/users/{{user.id}}/delete" method="POST">
+                <button class="btn btn-outline-danger">DELETE</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+
