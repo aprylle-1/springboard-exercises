@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Post- {{user.get_user_full_name()}}{% endblock %}
+
+{% block content %}
+<h1>Add Post for {{user.get_user_full_name()}}</h1>
+<form action="/users/{{user.id}}/posts/new" method="POST">
+    <div><label for="title">Title</label></div>
+    <div><input class="form-control" type="text" name="title"></div>
+    <div><label for="post-content">Post Content</label></div>
+    <div><input class="form-control" type="text" name="content"></div>
+    <a class="btn btn-outline-primary" href="/users/{{user.id}}">Cancel</a>
+    <button class="btn btn-outline-success">Add</button>
+</form>
+{% endblock %}
