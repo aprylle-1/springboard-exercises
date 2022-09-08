@@ -5,7 +5,6 @@
 {% endblock %}
 {% block title%}User {{user.get_user_full_name()}}{% endblock %}
 {% block content %}
-<h1>{{user.get_user_full_name()}}</h1>
 <style>
     .user-profile{
         display: flex;
@@ -13,7 +12,7 @@
     }
 
     .user-details{
-        margin: auto;
+        padding-top: 20px;
     }
     
     #user-image{
@@ -35,13 +34,23 @@
         <img id="user-image" src="{{user.image_url}}" alt="">
     </div>
     <div class="user-details">
-        <div>First Name - {{user.first_name}}</div>
-        <div>Last name - {{user.last_name}}</div>
+        <h1>{{user.get_user_full_name()}}</h1>
         <div class="buttons">
             <a href="/users/{{user.id}}/edit" class="btn btn-outline-primary">Edit</a>
             <form action="/users/{{user.id}}/delete" method="POST">
                 <button class="btn btn-outline-danger">DELETE</button>
             </form>
+        </div>
+        <div id="posts">
+            <h2>Posts</h2>
+            <ul>
+                {% if posts %}
+                {% for post in posts %}
+                <li><a href="/posts/{{post.id}}">{{post.title}}</a></li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+            <a class="btn btn-outline-primary" href="/users/{{user.id}}/posts/new">Add Post</a>
         </div>
     </div>
 

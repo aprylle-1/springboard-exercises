@@ -1,5 +1,6 @@
 """Models for Blogly."""
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -24,7 +25,7 @@ class User(db.Model):
 
     last_name = db.Column(db.String(50), nullable=False)
 
-    image_url = db.Column(db.String(200), nullable=True)
+    image_url = db.Column(db.String(200), nullable=False, default=default_img)
 
     @classmethod
     def add_user(cls, first_name, last_name, image_url=default_img):
@@ -61,3 +62,32 @@ class User(db.Model):
         
         return f"{self.first_name} {self.last_name}"
 
+class Post(db.Model):
+    """Post Model"""
+
+    __tablename__ = "posts"
+
+    datetime_now = datetime.now()
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    title = db.Column(db.String(50), nullable=False)
+
+    content = db.Column(db.Text, nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime_now)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+
+    user = db.relationship("User", backref="posts")
+
+    def __repr__(self):
+        """Show information about the Post Object"""
+        p = self
+        return f"<{p.title} {p.content}>"
+
+    @classmethod
+    def add_new_post(cls, title, content, user_id):
+        post = cls(title=title, content=content, user_id=user_id)
+        db.session.add(post)
+        db.session.commit()
