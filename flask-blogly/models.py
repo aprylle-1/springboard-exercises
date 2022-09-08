@@ -91,3 +91,8 @@ class Post(db.Model):
         post = cls(title=title, content=content, user_id=user_id)
         db.session.add(post)
         db.session.commit()
+
+    def convert_time(self):
+        test_date_format = '%Y-%m-%d %H:%M:%S.%f'
+        strp_time = datetime.strptime(str(self.created_at), test_date_format)
+        return strp_time.strftime("%a %b %d %Y, %H:%M %p")

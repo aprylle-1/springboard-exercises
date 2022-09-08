@@ -6,6 +6,7 @@
 <h1>{{post.title}}</h1>
 <p>{{post.content}}</p>
 <form action="/posts/{{post.id}}/delete" method="POST">
+    <a class="btn btn-outline-primary" href="/users/{{post.user_id}}">Cancel</a>
     <a class="btn btn-outline-primary" href="/posts/{{post.id}}/edit">Edit</a>
     <button class="btn btn-outline-danger">Delete</button>
 </form>

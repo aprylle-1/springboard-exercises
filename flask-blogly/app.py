@@ -4,7 +4,8 @@ from crypt import methods
 from email.mime import image
 from flask import Flask, render_template, request, redirect, session
 from models import db, connect_db, User, Post, default_img
-
+from sqlalchemy import desc
+from datetime import datetime
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,11 +17,11 @@ connect_db(app)
 
 @app.route('/')
 def home_page():
-    """View will list all users in database - Will be fixed in the future"""
+    """Gets 5 Most Recent Post"""
     
-    users = User.get_all_users()
-    
-    return render_template('home.html', users=users)
+    top_five_latest_posts = Post.query.order_by(desc(Post.created_at)).limit(5).all()
+
+    return render_template('home.html', posts=top_five_latest_posts)
 
 @app.route('/users')
 def list_all_users():
@@ -69,10 +70,13 @@ def create_user():
 @app.route('/users/<user_id>', methods=['GET'])
 def show_user_details(user_id):
     """Show User Details"""
+    
+    errors = session.get("errors", [])
+    session["errors"] = []
 
     user = User.get_user_by_id(user_id)
     posts = user.posts
-    return render_template('user-details.html', user=user, posts=posts)
+    return render_template('user-details.html', user=user, posts=posts, errors=errors)
 
 @app.route('/users/<user_id>/edit', methods=['GET'])
 def show_edit_form(user_id):
@@ -122,24 +126,50 @@ def edit_user(user_id):
 @app.route('/users/<user_id>/delete', methods=["POST"])
 def delete_user(user_id):
     """Delete User by ID"""
-
-    User.delete_user(user_id)
+    user = User.query.get(user_id)
+    posts = user.posts
+    errors = []
+    if posts:
+        errors.append("Cannot delete user with posts")
+        session["errors"] = errors
+        return redirect(f"/users/{user_id}")
+    
+    else:
+        User.delete_user(user_id)
     return redirect("/users")
 
 @app.route("/users/<user_id>/posts/new", methods=["GET"])
 def get_add_post_form(user_id):
     """Route that directs the user to the creat post form"""
+    
+    errors = []
+    
+    if session.get("errors", []):
+        errors = session["errors"]
+        session["errors"] = []
+    
     user = User.query.get(user_id)
-    return render_template('create-post-form.html', user = user)
+    
+    return render_template('create-post-form.html', user = user, errors=errors)
 
 @app.route("/users/<user_id>/posts/new", methods=["POST"])
 def add_post_for_user(user_id):
     """Route that processes the post request"""
     
+    errors = []
     title = request.form["title"]
     content = request.form["content"]
 
-    post = Post(title=title, content=content, user_id=user_id)
+    if not title:
+        errors.append("Missing title")
+    if not content:
+        errors.append("Content Missing")
+    
+    if errors:
+        session["errors"] = errors
+        return redirect(f"/users/{user_id}/posts/new")
+
+    post = Post(title=title, content=content, user_id=user_id, created_at=datetime.now())
     db.session.add(post)
     db.session.commit()
     return redirect(f"/users/{user_id}")
@@ -193,7 +223,6 @@ def edit_post(post_id):
         db.session.commit()
     
         return redirect(f"/posts/{post_id}")
-
 
 @app.route("/posts/<post_id>/delete", methods=["POST"])
 def delete_post(post_id):

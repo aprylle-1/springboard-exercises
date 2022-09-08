@@ -4,6 +4,11 @@
 
 {% block content %}
 <h1>Add Post for {{user.get_user_full_name()}}</h1>
+{% if errors %}
+    {%for error in errors%}
+    <p class="alert alert-danger">{{error}}</p>
+    {% endfor %}
+{% endif %}
 <form action="/users/{{user.id}}/posts/new" method="POST">
     <div><label for="title">Title</label></div>
     <div><input class="form-control" type="text" name="title"></div>
