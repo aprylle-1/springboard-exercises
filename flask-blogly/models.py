@@ -81,6 +81,8 @@ class Post(db.Model):
 
     user = db.relationship("User", backref="posts")
 
+    tags = db.relationship("PostTag", backref="post")
+
     def __repr__(self):
         """Show information about the Post Object"""
         p = self
@@ -96,3 +98,27 @@ class Post(db.Model):
         test_date_format = '%Y-%m-%d %H:%M:%S.%f'
         strp_time = datetime.strptime(str(self.created_at), test_date_format)
         return strp_time.strftime("%a %b %d %Y, %H:%M %p")
+
+class Tag(db.Model):
+    """Tags"""
+
+    __tablename__ = "tags"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    name = db.Column(db.Text, nullable=False, unique=True)
+
+    posts = db.relationship('PostTag', backref="tag")
+
+    def __repr__(self):
+        return f"<{self.id} {self.name}>"
+
+class PostTag(db.Model):
+
+    __tablename__ = "posts_tags"
+
+    post_id = db.Column(db.Integer, db.ForeignKey("posts.id"), primary_key=True)
+
+    tag_id = db.Column(db.Integer, db.ForeignKey("tags.id"), primary_key=True)
+
+    

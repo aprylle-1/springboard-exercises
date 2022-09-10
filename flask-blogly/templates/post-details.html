@@ -3,8 +3,26 @@
 {% block title %}{{post.title}} - {{post.user.get_user_full_name()}}{% endblock %}
 
 {% block content %}
+<style>
+    .badge{
+        background-color: #007bff !important;
+    }
+    .badge a{
+        color: white !important;
+    }
+    .badge a:hover{
+        text-decoration: none;
+    }
+</style>
 <h1>{{post.title}}</h1>
 <p>{{post.content}}</p>
+{% if post.tags %}
+<p>Tags:
+    {% for tag in post.tags %}
+    <span class="badge rounded-pill text-bg-primary"><a  href="/tags/{{tag.tag.id}}">{{tag.tag.name}}</a></span>
+    {% endfor %}
+</p>
+{% endif %}
 <form action="/posts/{{post.id}}/delete" method="POST">
     <a class="btn btn-outline-primary" href="/users/{{post.user_id}}">Cancel</a>
     <a class="btn btn-outline-primary" href="/posts/{{post.id}}/edit">Edit</a>

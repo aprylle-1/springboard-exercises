@@ -3,7 +3,7 @@
 from crypt import methods
 from email.mime import image
 from flask import Flask, render_template, request, redirect, session
-from models import db, connect_db, User, Post, default_img
+from models import db, connect_db, User, Post, default_img, PostTag, Tag
 from sqlalchemy import desc
 from datetime import datetime
 app = Flask(__name__)
@@ -149,8 +149,9 @@ def get_add_post_form(user_id):
         session["errors"] = []
     
     user = User.query.get(user_id)
+    tags = Tag.query.all()
     
-    return render_template('create-post-form.html', user = user, errors=errors)
+    return render_template('create-post-form.html', user = user, errors=errors, tags=tags)
 
 @app.route("/users/<user_id>/posts/new", methods=["POST"])
 def add_post_for_user(user_id):
@@ -159,6 +160,8 @@ def add_post_for_user(user_id):
     errors = []
     title = request.form["title"]
     content = request.form["content"]
+
+    tags = request.form.getlist("tags")
 
     if not title:
         errors.append("Missing title")
@@ -172,6 +175,11 @@ def add_post_for_user(user_id):
     post = Post(title=title, content=content, user_id=user_id, created_at=datetime.now())
     db.session.add(post)
     db.session.commit()
+
+    post_tags = [PostTag(post_id=post.id, tag_id=tag) for tag in tags]
+    db.session.add_all(post_tags)
+    db.session.commit()
+    
     return redirect(f"/users/{user_id}")
 
 @app.route("/posts/<post_id>")
@@ -197,7 +205,11 @@ def get_edit_post_form(post_id):
     
     post = Post.query.get(post_id)
 
-    return render_template('edit-post.html', post=post, errors = errors)
+    tags = Tag.query.all()
+
+    post_tag_ids = [tag.tag_id for tag in post.tags]
+
+    return render_template('edit-post.html', post=post, errors = errors, tags=tags, post_tag_ids=post_tag_ids)
 
 @app.route("/posts/<post_id>/edit", methods=["POST"])
 def edit_post(post_id):
@@ -205,7 +217,7 @@ def edit_post(post_id):
     errors = []
     title = request.form["title"]
     content = request.form["content"]
-
+    tags = request.form.getlist("tags")
     if not title:
         errors.append("Missing Post Title")
     if not content:
@@ -219,7 +231,15 @@ def edit_post(post_id):
         post = Post.query.get(post_id)
         post.title = title
         post.content = content
+
+        for post_tag in post.tags:
+            db.session.delete(post_tag)
+
+        db.session.commit()
     
+        for tag in tags:
+            new_tag = PostTag(post_id=post_id, tag_id=tag)
+            db.session.add(new_tag)
         db.session.commit()
     
         return redirect(f"/posts/{post_id}")
@@ -235,3 +255,102 @@ def delete_post(post_id):
     db.session.commit()
 
     return redirect(f"/users/{user_id}")
+
+@app.route("/tags")
+def get_all_tags():
+    tags = Tag.query.all()
+
+    return render_template("tags.html", tags=tags)
+
+@app.route("/tags/<tag_id>")
+def show_tag_details(tag_id):
+    tag = Tag.query.get(tag_id)
+    posts_tags = tag.posts
+
+    posts = []
+
+    for post in posts_tags:
+        posts.append(post.post)
+
+    return render_template("tag-details.html", tag=tag, posts=posts)
+
+@app.route("/tags/new", methods=["GET"])
+def get_add_tag_form():
+
+    errors = session.get("errors", [])
+    session["errors"] = []
+
+    return render_template("create-tag-form.html", errors = errors)
+
+@app.route("/tags/new", methods=["POST"])
+def add_tag():
+
+    name = request.form.get("name", "")
+    all_tags = Tag.query.all()
+    names = []
+    for tag in all_tags:
+        names.append(tag.name)
+
+    errors = []
+    if not name:
+        errors.append("No tag name was submitted")
+        session["errors"] = errors
+        return redirect("/tags/new")
+
+    elif name and name in names:
+        errors.append("Tag name already exists")
+        session["errors"] = errors
+        return redirect("/tags/new")
+    
+    else:
+        tag = Tag(name=name)
+        db.session.add(tag)
+        db.session.commit()
+        return redirect("/tags")
+
+@app.route("/tags/<tag_id>/edit", methods=["GET"])
+def get_edit_tag_form(tag_id):
+
+    errors = session.get("errors", [])
+    tag = Tag.query.get(tag_id)
+    session["errors"] = []
+    return render_template("edit-tag.html", errors=errors, tag=tag)
+
+@app.route("/tags/<tag_id>/edit", methods=["POST"])
+def edit_tag(tag_id):
+
+    tag = Tag.query.get(tag_id)
+    name = request.form.get("name", "")
+    errors = []
+    all_tags = Tag.query.all()
+    names = [tag.name for tag in all_tags]
+    
+    if not name:
+        errors.append("Tag Name is a required field")
+        session["errors"] = errors
+        return redirect(f"/tags/{tag_id}/edit")
+    if name == tag.name:
+        return redirect("/tags")
+    if name and name in names:
+        session["errors"] = errors
+        errors.append("Tag Name already exists")
+        return redirect(f"/tags/{tag_id}/edit")
+    
+    tag.name = name
+    db.session.commit()
+    return redirect("/tags")
+
+@app.route("/tags/<tag_id>/delete", methods=["POST"])
+def delete_tag(tag_id):
+
+    tag = Tag.query.get(tag_id)
+    posts = tag.posts
+
+    if posts:
+        for post in posts:
+            db.session.delete(post)
+    
+    db.session.delete(tag)
+    db.session.commit()
+
+    return redirect("/tags")

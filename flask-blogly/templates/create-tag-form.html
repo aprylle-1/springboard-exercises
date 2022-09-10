@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Tag{% endblock %}
+
+{% block content %}
+<style>
+    .buttons{
+        margin-top:30px;
+    }
+</style>
+<h1>Create a tag</h1>
+    <form action="/tags/new" method="POST">
+        {% if errors %}
+            {% for error in errors %}
+            <p class="alert alert-danger">{{error}}</p>
+            {% endfor %}
+        {% endif %}
+        <div>
+            <label for="tag_name">Name</label>
+            <input class="form form-control" name="name" id="tag_name" type="text">
+        </div>
+        <div class="buttons">
+            <a class="btn btn-outline-primary" href="/tags">Cancel</a>
+            <button class="btn btn-success">Add</button>
+        </div>
+    </form>
+{% endblock %}

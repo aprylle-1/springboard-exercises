@@ -15,6 +15,26 @@
     <div><input type="text" name="title" value="{{post.title}}"></div>
     <div><label for="content">Post Content</label></div>
     <div><input type="text" name="content" value="{{post.content}}"></div>
+    <div><label for="tags">Tags</label></div>
+    {% if tags %}
+        {% for tag in tags %}
+        {% if tag.id in post_tag_ids%}
+        <div class="form-check">
+            <input name="tags" class="form-check-input" type="checkbox" value="{{tag.id}}" id="{{tag.name}}" checked>
+            <label class="form-check-label" for="{{tag.name}}">
+              {{tag.name}}
+            </label>
+          </div>
+        {% else %}
+        <div class="form-check">
+            <input name="tags" class="form-check-input" type="checkbox" value="{{tag.id}}" id="{{tag.name}}">
+            <label class="form-check-label" for="{{tag.name}}">
+              {{tag.name}}
+            </label>
+          </div>
+        {% endif %}
+        {% endfor %}
+    {% endif %}
     <div>
         <a href="/users/{{post.user_id}}" class="btn btn-outline-primary">Cancel</a>
         <button class="btn btn-outline-success">Save</button>
