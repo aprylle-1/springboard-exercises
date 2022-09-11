@@ -112,18 +112,19 @@ VALUES
 
 -----------------------------------------------------------------------------
 
-SELECT passengers.first_name, passengers.last_name, 
-seat, departure, arrival, 
-airlines.airline, cities.city as from_city, 
-countries.country as from_country, 
-cities.city as to_city, 
-countries.country as to_country 
+SELECT passengers.first_name,
+passengers.last_name,
+tickets.departure,
+tickets.arrival,
+airlines.airline,
+t.city as to_city,
+f.city as from_city
 FROM tickets
-JOIN passengers
-ON (tickets.passenger_id = passengers.id)
-JOIN cities
-ON (cities.id = tickets.to_city)
-ON (cities.id = tickets.from_city)
-JOIN countries
-ON (countries.id = tickets.from_country)
-ON (countries.id = tickets.to_country)
+LEFT JOIN cities t
+ON t.id = tickets.to_city
+LEFT JOIN cities f
+ON f.id = tickets.from_city
+LEFT JOIN passengers
+ON tickets.passenger_id = passengers.id
+LEFT JOIN airlines
+ON tickets.airline_id = airlines.id
