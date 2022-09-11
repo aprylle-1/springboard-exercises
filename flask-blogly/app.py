@@ -248,6 +248,12 @@ def edit_post(post_id):
 def delete_post(post_id):
     post = Post.query.get(post_id)
     
+    post_tags = post.tags
+
+    for post_tag in post_tags:
+        db.session.delete(post_tag)
+        db.session.commit()
+    
     user_id = post.user.id
     
     db.session.delete(post)
