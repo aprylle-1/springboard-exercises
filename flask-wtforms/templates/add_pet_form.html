@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Add Pet{% endblock %}
+
+{% block content %}
+<h1>Add Pet</h1>
+<form method="POST" action="/add">
+{{ form.hidden_tag() }}
+{% for field in form if field.widget.input_type != "hidden" %}
+
+{% if field.short_name == "name" %}
+    <div>
+        {{field.label}}
+        {% if field.data %}
+        <input class="form-control" id="name" name="name" type="text" value="{{field.data}}">
+        {% else %}
+        <input class="form-control" id="name" name="name" type="text" value="">
+        {% endif %}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+
+{% elif field.short_name == "species" %}
+    <div>
+    {{field.label}}
+    <select class="form-control" id="species" name="species">
+    {% for choice in field.choices %}
+    {% if choice[0]== field.data %}
+    <option selected value="{{choice[0]}}">{{choice[1]}}</option>
+    {% else %}
+    <option value="{{choice[0]}}">{{choice[1]}}</option>
+    {% endif %}
+    {% endfor %}
+    </select>
+    {% for error in field.errors %}
+    <small class="text-danger">{{error}}</small>
+    {% endfor %}
+    </div>
+
+{% elif field.short_name == "age"%}
+    <div>
+        {{field.label}}
+        {% if field.data and not errors %}
+        <input class="form-control" id="age" name="age" type="text" value="{{field.data}}">
+        {% else %}
+        <input class="form-control" id="age" name="age" type="text" value="">
+        {% endif %}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+
+{% elif field.short_name == "available"%}
+    <div>
+    {{field.label}}
+    <input class="form-control" id="available" name="available" type="checkbox" value="y" checked>
+    </div>
+{% else %}
+    <div>
+        {{field.label}}
+        {{field(class_="form-control")}}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endfor %}
+
+<button style="margin-top: 15px"class="btn btn-primary btn-lg">Add</button>
+
+</form>
+
+{% endblock %}

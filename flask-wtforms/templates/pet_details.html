@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block  title %}{{pet.name}}{% endblock  %}
+
+{% block content %}
+<div class="card-text-center">
+<div class="card-header">{{pet.name}}</div>
+<div class="card-body">
+<img class="img-thumbnail" src="{{pet.photo_url}}" alt="This is a very cute {{pet.species}}">
+{% if pet.age %}
+<p>Age: {{pet.age}}</p>
+{% endif %}
+{% if pet.notes %}
+<p>{{pet.notes}}</p>
+{% endif %}
+<div class="card-footer text-muted">
+{% if pet.available %}
+<p>{{pet.name }} is available for adoption!</p>
+{% else %}
+<p>{{pet.name}} has been adopted! Yay!</p>
+{% endif %}
+</div>
+</div>
+</div>
+<form method="POST" action="/{{pet.id}}">
+{{ form.hidden_tag() }}
+{% for field in form if field.widget.input_type != "hidden" %}
+
+{% if field.short_name == "name" %}
+    <div>
+        {{field.label}}
+        {% if field.data %}
+        <input class="form-control" id="name" name="name" type="text" value="{{field.data}}">
+        {% else %}
+        <input class="form-control" id="name" name="name" type="text" value="">
+        {% endif %}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+
+{% elif field.short_name == "species" %}
+    <div>
+    {{field.label}}
+    <select class="form-control" id="species" name="species">
+    {% for choice in field.choices %}
+    {% if choice[0]== field.data %}
+    <option selected value="{{choice[0]}}">{{choice[1]}}</option>
+    {% else %}
+    <option value="{{choice[0]}}">{{choice[1]}}</option>
+    {% endif %}
+    {% endfor %}
+    </select>
+    {% for error in field.errors %}
+    <small class="text-danger">{{error}}</small>
+    {% endfor %}
+    </div>
+
+{% elif field.short_name == "age"%}
+    <div>
+        {{field.label}}
+        {% if field.data and not errors %}
+        <input class="form-control" id="age" name="age" type="text" value="{{field.data}}">
+        {% else %}
+        <input class="form-control" id="age" name="age" type="text" value="">
+        {% endif %}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+
+{% elif field.short_name == "available "%}
+    {{field.label}}
+    {% if form.available %}
+    <input class="form-control" id="available" name="available" type="checkbox" value="y" checked>
+    {% else %}
+    {{field(class_="form-control")}}
+    {% endif %}
+
+{% else %}
+    <div>
+        {{field.label}}
+        {{field(class_="form-control")}}
+        {% for error in field.errors %}
+        <small class="text-danger">{{error}}</small>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endfor %}
+
+<button style="margin-top: 15px"class="btn btn-primary btn-lg">Edit</button>
+
+</form>
+{% endblock  %}
