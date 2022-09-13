@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from app import app
-from models import db, User, Post, default_img
+from models import db, User, Post, Tag, PostTag, default_img
 
 app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql:///test_blogly'
 app.config["SQLALCHEMY_ECHO"] = False
@@ -20,16 +20,35 @@ class UserViewsTestCast(TestCase):
         """Add a Sample User"""
 
         #delete all users
+        PostTag.query.delete()
+        Tag.query.delete()
         Post.query.delete()
         User.query.delete()
+        
         user_id = User.add_user(first_name="SampleUser", last_name="SampleLastName")
+        
         post = Post(title="Test Title", content="This is a test post", user_id = user_id)
+        
+        tag = Tag(name="SampleTag")
+        
+        db.session.add(tag)
         db.session.add(post)
+
         db.session.commit()
+        
+        post_tag = PostTag(post_id=post.id, tag_id=tag.id)
+
+        db.session.add(post_tag)
+        db.session.commit()        
+        
         user = User.query.get(user_id)
+        
         self.post = post
+        
         self.user_id = user_id
+        
         self.first_name = user.first_name
+        
         self.last_name = user.last_name
 
     def tearDown(self):
@@ -124,6 +143,14 @@ class UserViewsTestCast(TestCase):
 
     def test_delete_user(self):
         """Test delete user function"""
+
+        #user cannot be deleted if it has existing posts
+        #posts cannot be deleted if it has a post_tag relationship
+        #code below first deletes all PostTags in the table then deletes the posts
+        #should actually be referenced instead by user id instead of deleting all the post and post_tag
+        #PLEASE FIX THIS LATER
+
+        PostTag.query.delete()
         Post.query.delete()
         with app.test_client() as client:
             resp = client.post(f"/users/{self.user_id}/delete" ,follow_redirects=True)
@@ -149,7 +176,7 @@ class UserViewsTestCast(TestCase):
         """Test add post function/route"""
 
         with app.test_client() as client:
-            data = {"title" : "Test Post", "content" : "This is a Test Case"}
+            data = {"title" : "Test Post", "content" : "This is a Test Case", "tags" : [1]}
             resp = client.post(f"/users/{self.user_id}/posts/new", data=data, follow_redirects=True)
 
             html = resp.get_data(as_text=True)
@@ -167,6 +194,7 @@ class UserViewsTestCast(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("This is a test post", html)
             self.assertIn("Test Title", html)
+            self.assertIn("SampleTag", html)
     
     def test_get_edit_post_form(self):
         """Test route that obtains/generates the Post Edit Form"""
@@ -210,3 +238,4 @@ class UserViewsTestCast(TestCase):
 
             self.assertEqual(resp.status_code, 200)
             self.assertNotIn("Test Title", html)
+
