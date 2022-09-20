@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <style>
+    #navbar-right a{
+        margin-right: 10px;
+    }
+    .form{
+        width: 50%;
+    }
+    .card{
+        margin: 10px 10px 10px 0px;
+        width: 50%;
+    }
+    </style>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        
+        <div class="container-fluid">
+            <a href="/register" class="navbar-brand">Auth Demo</a>
+        </div>
+
+        <div id="navbar-right" style="display: flex;">
+            
+            {% if session.get("user") %}
+            <form action="/logout" method="POST">
+            <button class="btn btn-link">Logout</button>
+            </form>
+            
+            {% else %}
+            <a href="/register" class="nav-link" style="color: white!important;">Register</a>
+
+            <a href="/login" class="nav-link" style="color: white!important;">Login</a>
+            
+            {% endif %}
+        
+        </div>
+
+    </nav>
+    
+    <div class="container">
+        {% block page_h1 %}{% endblock %}
+        
+        {% for category, msg in get_flashed_messages(with_categories=True)%}
+            <div class="alert alert-{{category}}">{{msg}}</div>
+        {% endfor %}
+    </div>
+    
+    <div class="container">
+    {% block content %}
+    {% endblock%}
+
+    </div>
+</body>
+</html>

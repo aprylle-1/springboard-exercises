@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{user.username}}{% endblock  %}
+
+{% block content %}
+<h1>{{user.username}}</h1>
+<div class="card" style="width: 18rem;">
+  <div class="card-header" style="display: flex;">
+    <div >
+        {{user.username}}
+    </div>
+    <form action="/users/{{user.username}}/delete" method="POST" style="float: right;">
+    <button class="btn btn-outline-danger" style="margin-left: 10px !important;"><i class="fa-solid fa-trash"></i></button>
+    </form>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">{{user.email}}</li>
+    <li class="list-group-item">{{user.first_name}}</li>
+    <li class="list-group-item">{{user.last_name}}</li>
+  </ul>
+</div>
+<div>
+  <h2>Feedbacks <a href="/users/{{user.username}}/feedback/add" style="margin-left: 20px!important;" class="btn btn-outline-success">Add</a></h2>
+  {% for feedback in feedbacks %}
+  <div class="card">
+  <div class="card-body">
+    <h5 class="card-title">{{feedback.title}}</h5>
+    <h6 class="card-subtitle mb-2 text-muted">By {{feedback.username}}</h6>
+    <p class="card-text">{{feedback.content}}</p>
+    <div>
+        <a href="/feedbacks/{{feedback.id}}/update" class="btn btn-outline-primary">Edit</a>
+        <form action="/feedbacks/{{feedback.id}}/delete" method="POST" style="float: right;">
+        <button class="btn btn-outline-danger" style="margin-left: 10px !important;"><i class="fa-solid fa-trash"></i></button>
+    </form>
+    </div>
+  </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock  %}
