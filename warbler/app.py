@@ -6,7 +6,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
-from models import db, connect_db, User, Message, Follows
+from models import Likes, db, connect_db, User, Message, Follows
 
 CURR_USER_KEY = "curr_user"
 
@@ -156,7 +156,10 @@ def users_show(user_id):
                 .order_by(Message.timestamp.desc())
                 .limit(100)
                 .all())
-    return render_template('users/show.html', user=user, messages=messages)
+
+    like_count = len(db.session.query(Likes).filter(Likes.user_id == user.id).all())
+
+    return render_template('users/show.html', user=user, messages=messages, like_count=like_count)
 
         
 @app.route('/users/<int:user_id>/following')
@@ -255,6 +258,39 @@ def delete_user():
 
     return redirect("/signup")
 
+@app.route("/users/add_like/<int:message_id>", methods=["POST"])
+def add_like(message_id):
+    """Add like message"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    user = g.user
+
+    like = Likes(user_id=user.id, message_id=message_id)
+
+    db.session.add(like)
+    db.session.commit()
+
+    return redirect("/")
+
+@app.route("/users/delete_like/<int:message_id>", methods=["POST"])
+def delete_like(message_id):
+    """Remove liked message"""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+
+    user = g.user
+
+    liked = db.session.query(Likes).filter(Likes.user_id == user.id, Likes.message_id == message_id).first()
+
+    db.session.delete(liked)
+
+    db.session.commit()
+
+    return redirect("/")
 
 ##############################################################################
 # Messages routes:
@@ -304,6 +340,14 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+@app.route("/likes/<int:user_id>")
+def show_likes(user_id):
+
+
+    messages = db.session.query(Message).join(Likes).filter(Likes.user_id == user_id).all()
+
+    return render_template("users/show.html", messages=messages)
+
 
 ##############################################################################
 # Homepage and error pages
@@ -320,7 +364,10 @@ def homepage():
     if g.user:
         user = g.user
         messages = (db.session.query(Message).join(Follows, Follows.user_being_followed_id == Message.user_id, isouter=True).filter((Message.user_id == user.id) | (Follows.user_following_id == user.id)).order_by(Message.timestamp.desc()).limit(100).all())
-        return render_template('home.html', messages=messages)
+        
+        likes = [ like.message_id for like in db.session.query(Likes).filter(Likes.user_id == user.id).all() ]
+        
+        return render_template('home.html', messages=messages, likes=likes, user_id = user.id)
 
     else:
         return render_template('home-anon.html')
