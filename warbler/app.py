@@ -21,7 +21,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -343,10 +343,14 @@ def messages_destroy(message_id):
 @app.route("/likes/<int:user_id>")
 def show_likes(user_id):
 
-
+    if not g.user:
+        if not g.user:
+            flash("Access unauthorized.", "danger")
+            return redirect("/")
+    
     messages = db.session.query(Message).join(Likes).filter(Likes.user_id == user_id).all()
 
-    return render_template("users/show.html", messages=messages)
+    return render_template("users/likes.html", messages=messages)
 
 
 ##############################################################################

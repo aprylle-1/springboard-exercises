@@ -51,6 +51,20 @@ class MessageViewTestCase(TestCase):
 
         db.session.commit()
 
+    def test_show_add_new_message(self):
+        """Is the form being shown?"""
+
+        with self.client as client:
+            with client.session_transaction() as session:
+                session[CURR_USER_KEY] = self.testuser.id
+
+            resp = client.get("/messages/new")
+
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<button class="btn btn-outline-success btn-block">Add my message!</button>', html)
+
     def test_add_message(self):
         """Can use add a message?"""
 
