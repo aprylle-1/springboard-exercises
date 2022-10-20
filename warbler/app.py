@@ -251,8 +251,13 @@ def delete_user():
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    do_logout()
+    user = g.user
 
+    messages = Message.query.filter(Message.user_id == user.id)
+    for message in messages:
+        db.session.delete(message)
+    do_logout()
+    
     db.session.delete(g.user)
     db.session.commit()
 
